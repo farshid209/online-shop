@@ -12,7 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentViewModelDto {
-    private Long id;
     private List<InvoiceItemDto> items;
     private UserViewModelDto user;
 }

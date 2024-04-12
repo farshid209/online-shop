@@ -7,6 +7,7 @@ import org.example.entity.Invoice;
 import org.example.framework.exception.NotFoundException;
 import org.example.framework.mapping.ObjectMapper;
 import org.example.framework.services.operations.CreateService;
+import org.example.framework.services.operations.UpdateService;
 import org.example.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -14,10 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class InvoiceService implements CreateService<Long, InvoiceDto> {
+public class InvoiceService implements CreateService<Long, InvoiceDto>, UpdateService<Long, InvoiceDto> {
     private static final Logger LOGGER = LogManager.getLogger(InvoiceService.class);
 
     private final InvoiceRepository repository;
@@ -49,5 +51,15 @@ public class InvoiceService implements CreateService<Long, InvoiceDto> {
                 .stream()
                 .map(entity -> mapper.map(entity, InvoiceDto.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void update(Long id, InvoiceDto invoiceDto) throws NotFoundException {
+        Invoice invoice = repository.findById(id).orElseThrow(NotFoundException::new);
+
+        Optional.ofNullable(invoiceDto.getPaymentDate()).ifPresent(invoice::setPaymentDate);
+        Optional.ofNullable(invoiceDto.getStatus()).ifPresent(invoice::setStatus);
+
+        repository.save(invoice);
     }
 }
